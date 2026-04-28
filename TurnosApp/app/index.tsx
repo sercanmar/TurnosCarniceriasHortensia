@@ -1,10 +1,21 @@
 import { View, Text, Alert, TouchableOpacity, Image } from 'react-native';
 import { useTurnosStore } from '../presentation/store/useTurnosStore';
 import { ThemedButton } from '../presentation/theme/components/ThemedButton';
+import { useServidor } from '../hooks/useServidor';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
-  const { miTurno, turnoActual, pedirTurno, cancelarTurno } = useTurnosStore();
-
+  const { miTurno, turnoActual, cancelarTurno } = useTurnosStore();
+const { conectar, solicitarTurno } = useServidor();
+useEffect(() => {
+    conectar((datos) => {
+      if (datos.accion === 'ACTUALIZAR_PANTALLA') {
+        useTurnosStore.setState({ turnoActual: datos.ticket });
+      } else if (datos.accion === 'TURNO_ASIGNADO') {
+        useTurnosStore.setState({ miTurno: datos.ticket });
+      }
+    });
+  }, []);
   const tieneTurno = miTurno !== 'Sin turno';
 
   const confirmarCancelacion = () => {
@@ -45,7 +56,7 @@ export default function HomeScreen() {
         <ThemedButton 
           label="SACAR TURNO" 
           className="w-full mt-4 shadow-lg bg-red-900"
-          onPress={pedirTurno} 
+          onPress={solicitarTurno} 
         />
       ) : (
         <TouchableOpacity 
