@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # tu base de datos actual para el servidor java
   db:
     image: mysql:8.0
     container_name: mysql_turnos
@@ -11,3 +12,25 @@ services:
       - "3306:3306"
     volumes:
       - ./src/turnos.sql:/docker-entrypoint-initdb.d/turnos.sql
+
+  # la base de datos exclusiva para que funcione odoo
+  db_odoo:
+    image: postgres:15
+    container_name: postgres_odoo
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+
+  # el contenedor del erp crm
+  odoo:
+    image: odoo:16.0
+    container_name: odoo_turnos
+    depends_on:
+      - db_odoo
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=db_odoo
+      - USER=odoo
+      - PASSWORD=odoo

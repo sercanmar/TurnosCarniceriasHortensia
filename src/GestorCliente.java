@@ -40,6 +40,8 @@ public class GestorCliente implements Runnable {
                         BBDD bd = new BBDD();
                         String nuevoTicket = bd.registrarNuevoTurno(mensaje);
 
+                        SincronizadorOdoo.enviarCliente(nuevoTicket);
+
                         MensajeRed respuesta = new MensajeRed("TURNO_ASIGNADO", "SERVIDOR", nuevoTicket, "");
                         String jsonRespuesta = gson.toJson(respuesta);
 
