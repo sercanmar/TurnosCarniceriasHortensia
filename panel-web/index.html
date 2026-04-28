@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostrador - Carnicerías Hortensia</title>
+    <title>Pantalla - Carnicerías Hortensia</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-stone-50 h-screen flex flex-col items-center justify-center p-6">
 
-    <h1 class="text-4xl font-bold text-red-900 mb-2 uppercase tracking-widest">Panel de Operario</h1>
+    <h1 class="text-4xl font-bold text-red-900 mb-2 uppercase tracking-widest">Pantalla de Turnos</h1>
     <p class="text-gray-500 mb-10">Carnicerías Hortensia</p>
 
     <div class="bg-white p-10 rounded-3xl w-full max-w-md items-center justify-center flex flex-col mb-8 shadow-md border border-gray-100">
@@ -16,51 +16,43 @@
         <p id="turnoActual" class="text-9xl font-black text-slate-800">T-0</p>
     </div>
 
-    <button onclick="llamarSiguiente()" class="bg-red-900 hover:bg-red-800 text-white font-bold py-6 px-12 rounded-2xl text-3xl shadow-xl w-full max-w-md transition-colors">
-        LLAMAR SIGUIENTE
-    </button>
-
     <p id="estadoConexion" class="mt-8 text-sm font-bold text-orange-500">Conectando al servidor...</p>
 
-    <script>
-      
-        const IP_SERVIDOR = "192.168.0.19";
-        const PUERTO = 8080;
- 
-        let socket;
+  <script>
+        const IP_SERVIDOR = "127.0.0.1"; 
+        const PUERTO = 8081;
+        
+        let turnoAnterior = "";
 
-        function conectar() {
-            socket = new WebSocket(`ws://${IP_SERVIDOR}:${PUERTO}/turnos`);
+        const sonido = new Audio('timbre.mp3');
 
-            socket.onopen = function(e) {
-                document.getElementById('estadoConexion').innerText = "🟢 Conectado al servidor";
-                document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-green-600";
-            };
-
-            socket.onmessage = function(event) {
-                const datos = JSON.parse(event.data);
-                if (datos.tipo === 'TURNO_ACTUAL') {
-                    document.getElementById('turnoActual').innerText = datos.numero;
-                }
-            };
-
-            socket.onclose = function(event) {
-                document.getElementById('estadoConexion').innerText = "🔴 Desconectado. Reintentando...";
-                document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-red-600";
-                setTimeout(conectar, 3000); // Intenta reconectar si se cae
-            };
+        function preguntarTurno() {
+            fetch(`http://${IP_SERVIDOR}:${PUERTO}/api`)
+                .then(res => {
+                    if (res.ok) {
+                        document.getElementById('estadoConexion').innerText = "🟢 Conectado al servidor";
+                        document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-green-600";
+                        return res.json();
+                    }
+                    throw new Error("error");
+                })
+                .then(datos => {
+                    document.getElementById('turnoActual').innerText = datos.ticket;
+                    
+                    if (turnoAnterior !== "" && turnoAnterior !== datos.ticket) {
+                        sonido.play().catch(e => console.log("el navegador ha bloqueado el sonido"));
+                    }
+                    
+                    turnoAnterior = datos.ticket;
+                })
+                .catch(err => {
+                    document.getElementById('estadoConexion').innerText = "🔴 Desconectado. Reintentando...";
+                    document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-red-600";
+                });
         }
 
-        function llamarSiguiente() {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                const mensaje = JSON.stringify({ accion: "SIGUIENTE_TURNO" });
-                socket.send(mensaje + '\n');
-            } else {
-                alert("No hay conexión con el servidor.");
-            }
-        }
-
-        conectar();
+        preguntarTurno();
+        setInterval(preguntarTurno, 5000);
     </script>
 </body>
 </html>
