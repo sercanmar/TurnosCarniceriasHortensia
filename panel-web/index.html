@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantalla - Carnicerías Hortensia</title>
+    <title>Pantalla - Clínica Azucena</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-stone-50 h-screen flex flex-col items-center justify-center p-6">
 
-    <h1 class="text-4xl font-bold text-red-900 mb-2 uppercase tracking-widest">Pantalla de Turnos</h1>
-    <p class="text-gray-500 mb-10">Carnicerías Hortensia</p>
+    <h1 class="text-4xl font-bold text-emerald-800 mb-2 uppercase tracking-widest">Sala de Espera</h1>
+    <p class="text-gray-500 mb-10 text-xl">Clínica Azucena</p>
 
     <div class="bg-white p-10 rounded-3xl w-full max-w-md items-center justify-center flex flex-col mb-8 shadow-md border border-gray-100">
         <p class="text-2xl text-gray-500 mb-2 font-medium">Atendiendo ahora:</p>
-        <p id="turnoActual" class="text-9xl font-black text-slate-800">T-0</p>
+        <p id="turnoActual" class="text-9xl font-black text-emerald-900">T-0</p>
     </div>
 
     <p id="estadoConexion" class="mt-8 text-sm font-bold text-orange-500">Conectando al servidor...</p>
 
-  <script>
+    <script>
         const IP_SERVIDOR = "127.0.0.1"; 
         const PUERTO = 8081;
         
+        // guardamos el ultimo turno que hemos visto para saber si cambia
         let turnoAnterior = "";
 
+        // creamos el sonido (tienes que descargar un mp3 que se llame timbre.mp3 y ponerlo en la misma carpeta)
         const sonido = new Audio('timbre.mp3');
 
         function preguntarTurno() {
@@ -39,10 +41,12 @@
                 .then(datos => {
                     document.getElementById('turnoActual').innerText = datos.ticket;
                     
+                    // si el turno es nuevo y no es la primera vez que cargamos la pagina, pitamos
                     if (turnoAnterior !== "" && turnoAnterior !== datos.ticket) {
                         sonido.play().catch(e => console.log("el navegador ha bloqueado el sonido"));
                     }
                     
+                    // actualizamos la memoria con el turno actual
                     turnoAnterior = datos.ticket;
                 })
                 .catch(err => {

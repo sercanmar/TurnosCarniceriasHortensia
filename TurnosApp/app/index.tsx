@@ -1,13 +1,16 @@
-import { View, Text, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, Image, TextInput } from 'react-native';
 import { useTurnosStore } from '../presentation/store/useTurnosStore';
 import { ThemedButton } from '../presentation/theme/components/ThemedButton';
 import { useServidor } from '../hooks/useServidor';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function HomeScreen() {
   const { miTurno, turnoActual, cancelarTurno } = useTurnosStore();
-const { conectar, solicitarTurno } = useServidor();
-useEffect(() => {
+  const { conectar, solicitarTurno } = useServidor();
+  
+  const [nombre, setNombre] = useState('');
+
+  useEffect(() => {
     conectar((datos) => {
       if (datos.accion === 'ACTUALIZAR_PANTALLA') {
         useTurnosStore.setState({ turnoActual: datos.ticket });
@@ -16,16 +19,16 @@ useEffect(() => {
       }
     });
   }, []);
+
   const tieneTurno = miTurno !== 'Sin turno';
 
   const confirmarCancelacion = () => {
     Alert.alert(
-      "cancelar turno",
-      "¿seguro que quieres cancelar tu turno?",
+      "cancelar cita",
+      " seguro que quieres cancelar tu cita?",
       [
         { text: "no", style: "cancel" },
-
-        { text: "sí, cancelar", onPress: cancelarTurno, style: "destructive" }
+        { text: "s , cancelar", onPress: cancelarTurno, style: "destructive" }
       ]
     );
   };
@@ -33,9 +36,9 @@ useEffect(() => {
   return (
     <View className="flex-1 bg-stone-50 items-center justify-center p-6">
       
-      <Image 
-        source={require('../assets/images/logo.png')} 
-        className="w-48 h-48 rounded-full mb-12 border-4 border-red-900 shadow-xl"
+      <Image
+        source={require('../assets/images/logo.png')}
+        className="w-48 h-48 rounded-full mb-12 border-4 border-emerald-700 shadow-xl"
         resizeMode="cover"
       />
 
@@ -48,25 +51,32 @@ useEffect(() => {
       {/* turno cliente */}
       <View className="bg-white p-8 rounded-3xl w-full items-center mb-10 shadow-sm border border-gray-100">
         <Text className="text-xl text-gray-500 mb-2 font-medium">Tu ticket:</Text>
-        <Text className="text-8xl font-black text-green-700">{miTurno}</Text>
+        <Text className="text-8xl font-black text-emerald-700">{miTurno}</Text>
       </View>
 
       {/* condicional btones */}
       {!tieneTurno ? (
-        <ThemedButton 
-          label="SACAR TURNO" 
-          className="w-full mt-4 shadow-lg bg-red-900"
-          onPress={solicitarTurno} 
-        />
+        <View className="w-full">
+          <TextInput
+            placeholder="escribe tu nombre completo"
+            value={nombre}
+            onChangeText={setNombre}
+            className="bg-white p-5 rounded-2xl mb-4 border border-emerald-200 text-lg shadow-sm text-gray-800"
+          />
+          <ThemedButton
+            label="PEDIR CITA"
+            className="w-full shadow-lg bg-emerald-700"
+            onPress={() => solicitarTurno(nombre)}
+          />
+        </View>
       ) : (
-        <TouchableOpacity 
+        <TouchableOpacity
           className="bg-gray-400 py-5 px-10 rounded-2xl items-center w-full mt-4 active:bg-gray-500 shadow-md"
           onPress={confirmarCancelacion}
         >
-          <Text className="text-white text-2xl font-bold">CANCELAR TURNO</Text>
+          <Text className="text-white text-2xl font-bold">CANCELAR CITA</Text>
         </TouchableOpacity>
       )}
-
     </View>
   );
 }

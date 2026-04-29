@@ -35,12 +35,12 @@ public class GestorCliente implements Runnable {
                 if (mensaje != null && mensaje.getAccion() != null) {
 
                     if (mensaje.getAccion().equals("PEDIR_TURNO")) {
-                        System.out.println("un usuario ha pedido turno");
+                        System.out.println("el paciente " + mensaje.getNombre() + " ha pedido turno");
 
                         BBDD bd = new BBDD();
                         String nuevoTicket = bd.registrarNuevoTurno(mensaje);
 
-                        SincronizadorOdoo.enviarCliente(nuevoTicket);
+                        SincronizadorOdoo.enviarCliente(nuevoTicket, mensaje.getNombre());
 
                         MensajeRed respuesta = new MensajeRed("TURNO_ASIGNADO", "SERVIDOR", nuevoTicket, "");
                         String jsonRespuesta = gson.toJson(respuesta);

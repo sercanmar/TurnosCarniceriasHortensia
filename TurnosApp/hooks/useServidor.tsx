@@ -40,13 +40,12 @@ export function useServidor() {
     });
   };
 
-  const solicitarTurno = () => {
+  const solicitarTurno = (nombrePaciente: string) => {
     if (clienteRef.current) {
-      const datos = { accion: "PEDIR_TURNO" };
+      const datos = { accion: "PEDIR_TURNO", nombre: nombrePaciente };
       const jsonEnviar = JSON.stringify(datos);
       
       console.log("enviando por tcp...", jsonEnviar);
-      // importante el \n para que el bufferedreader de java lo lea
       clienteRef.current.write(jsonEnviar + '\n');
     }
   };
