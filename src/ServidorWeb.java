@@ -70,6 +70,22 @@ public class ServidorWeb {
             System.out.println("error al avisar a los moviles");
         }
     }
+    public static void saltarATurno(int numero) {
+        contadorTurnos = numero;
+        turnoActual = "T-" + contadorTurnos;
+        System.out.println("\n>>> has saltado directamente al: " + turnoActual + " <<<");
+
+        try {
+            Gson gson = new Gson();
+            MensajeRed aviso = new MensajeRed("ACTUALIZAR_PANTALLA", "SERVIDOR", turnoActual, "MOSTRADOR 1");
+            String jsonAviso = gson.toJson(aviso);
+
+            // avisamos a los moviles para que piten
+            GestorConexiones.enviarATodos(jsonAviso);
+        } catch (Exception e) {
+            System.out.println("error al avisar a los moviles");
+        }
+    }
 
     public static void enviarMensaje(HttpExchange exchange, String msg) {
         try {

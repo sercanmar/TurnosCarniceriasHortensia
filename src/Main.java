@@ -34,9 +34,17 @@ public class Main {
             while (true) {
                 String letra = teclado.nextLine();
                 
-                // si el operario escribe s o S, pasamos turno
                 if (letra.equalsIgnoreCase("s")) {
                     ServidorWeb.avanzarTurno();
+                }
+                else if (letra.toLowerCase().startsWith("s") && letra.length() > 1) {
+                    try {
+                        String numeroTexto = letra.substring(1);
+                        int numero = Integer.parseInt(numeroTexto);
+                        ServidorWeb.saltarATurno(numero);
+                    } catch (Exception e) {
+                        System.out.println("no has escrito un numero despues de la s. prueba con s25 por ejemplo");
+                    }
                 }
             }
         });
