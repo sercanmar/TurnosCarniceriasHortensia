@@ -32,7 +32,23 @@ export default function HomeScreen() {
       ]
     );
   };
+  const calcularMinutos = () => {
+    if (!tieneTurno || turnoActual === 'T-0' || miTurno === 'Sin turno') return 0;
+    try {
+      const actual = parseInt(turnoActual.replace('T-', ''));
+      const mio = parseInt(miTurno.replace('T-', ''));
+      
+      const diferencia = mio - actual;
+      
+      if (diferencia <= 0) return 0;
+      
+      return diferencia * 10;
+    } catch (e) {
+      return 0;
+    }
+  };
 
+  const minutosEspera = calcularMinutos();
   return (
     <View className="flex-1 bg-stone-50 items-center justify-center p-6">
       
@@ -52,6 +68,12 @@ export default function HomeScreen() {
       <View className="bg-white p-8 rounded-3xl w-full items-center mb-10 shadow-sm border border-gray-100">
         <Text className="text-xl text-gray-500 mb-2 font-medium">Tu ticket:</Text>
         <Text className="text-8xl font-black text-emerald-700">{miTurno}</Text>
+      {tieneTurno && minutosEspera > 0 && (
+          <Text className="text-lg text-orange-500 mt-4 font-bold">
+            tiempo estimado: {minutosEspera} min
+          </Text>
+        )}
+
       </View>
 
       {/* condicional btones */}
