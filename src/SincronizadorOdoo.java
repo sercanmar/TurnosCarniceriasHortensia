@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 public class SincronizadorOdoo {
 
     private static final String URL_ODOO = "http://localhost:8069";
@@ -24,22 +25,37 @@ public class SincronizadorOdoo {
                     BD_ODOO, USUARIO, PASSWORD, Collections.emptyMap()
             ));
 
-            if (uidObj instanceof Boolean) return;
+            if (uidObj instanceof Boolean) {
+                System.out.println("cuidado: el usuario o la contraseña de odoo son incorrectos");
+                return;
+            }
             int uid = (Integer) uidObj;
 
             config.setServerURL(new URL(URL_ODOO + "/xmlrpc/2/object"));
 
             Map<String, Object> datosCliente = new HashMap<>();
-
             datosCliente.put("name", nombreReal + " (" + nombreTicket + ")");
 
-            client.execute("execute_kw", Arrays.asList(
+            Object idPartnerObj = client.execute("execute_kw", Arrays.asList(
                     BD_ODOO, uid, PASSWORD,
                     "res.partner", "create",
                     Collections.singletonList(datosCliente)
             ));
 
-            System.out.println("el paciente " + nombreReal + " se ha guardado bien en odoo");
+            int idPartner = (Integer) idPartnerObj;
+
+            Map<String, Object> datosCita = new HashMap<>();
+            datosCita.put("name", "Turno " + nombreTicket);
+            datosCita.put("partner_id", idPartner);
+            datosCita.put("description", "el paciente ha completado su turno");
+
+            client.execute("execute_kw", Arrays.asList(
+                    BD_ODOO, uid, PASSWORD,
+                    "crm.lead", "create",
+                    Collections.singletonList(datosCita)
+            ));
+
+            System.out.println("el paciente " + nombreReal + " y su atencion se han guardado bien en el crm");
 
         } catch (Exception e) {
             System.out.println("fallo la conexion con odoo: " + e.getMessage());
