@@ -30,7 +30,7 @@ public class BBDD {
                     ps.executeUpdate();
                     System.out.println("datos guardados correctamente.");
 
-                    // saco el id generado de la bd
+                    // saco el idgenerado de la bd
                     ResultSet rs = ps.getGeneratedKeys();
                     rs.next();
                     return "T-" + rs.getInt(1);
