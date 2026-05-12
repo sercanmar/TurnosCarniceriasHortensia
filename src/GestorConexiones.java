@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GestorConexiones {
-
+    // lista con todos los clientes conectados en este momento
     private static final List<GestorCliente> clientesActivos = new ArrayList<>();
 
     public static synchronized void agregarCliente(GestorCliente c) {

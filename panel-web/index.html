@@ -22,17 +22,15 @@
         const IP_SERVIDOR = "127.0.0.1"; 
         const PUERTO = 8081;
         
-        // guardamos el ultimo turno que hemos visto para saber si cambia
         let turnoAnterior = "";
 
-        // creamos el sonido (tienes que descargar un mp3 que se llame timbre.mp3 y ponerlo en la misma carpeta)
         const sonido = new Audio('timbre.mp3');
 
         function preguntarTurno() {
             fetch(`http://${IP_SERVIDOR}:${PUERTO}/api`)
                 .then(res => {
                     if (res.ok) {
-                        document.getElementById('estadoConexion').innerText = "🟢 Conectado al servidor";
+                        document.getElementById('estadoConexion').innerText = "conectado al servidor";
                         document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-green-600";
                         return res.json();
                     }
@@ -41,16 +39,14 @@
                 .then(datos => {
                     document.getElementById('turnoActual').innerText = datos.ticket;
                     
-                    // si el turno es nuevo y no es la primera vez que cargamos la pagina, pitamos
                     if (turnoAnterior !== "" && turnoAnterior !== datos.ticket) {
                         sonido.play().catch(e => console.log("el navegador ha bloqueado el sonido"));
                     }
                     
-                    // actualizamos la memoria con el turno actual
                     turnoAnterior = datos.ticket;
                 })
                 .catch(err => {
-                    document.getElementById('estadoConexion').innerText = "🔴 Desconectado. Reintentando...";
+                    document.getElementById('estadoConexion').innerText = "desconectado. volviendo a conectar";
                     document.getElementById('estadoConexion').className = "mt-8 text-sm font-bold text-red-600";
                 });
         }
