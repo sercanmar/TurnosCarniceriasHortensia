@@ -37,7 +37,6 @@ public class ServidorWeb {
                         enviarMensaje(exchange, json);
                         
                     } else if (exchange.getRequestMethod().equals("POST")) {
-                        // esto lo dejamos por si acaso, pero ya no lo usa la web
                         avanzarTurno();
                         enviarMensaje(exchange, "{\"estado\":\"ok\"}");
                     }
@@ -80,7 +79,6 @@ public class ServidorWeb {
             MensajeRed aviso = new MensajeRed("ACTUALIZAR_PANTALLA", "SERVIDOR", turnoActual, "MOSTRADOR 1");
             String jsonAviso = gson.toJson(aviso);
 
-            // avisamos a los moviles para que piten
             GestorConexiones.enviarATodos(jsonAviso);
         } catch (Exception e) {
             System.out.println("error al avisar a los moviles");

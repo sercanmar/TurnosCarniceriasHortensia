@@ -14,7 +14,7 @@ public class SincronizadorOdoo {
     private static final String PASSWORD = "12345";
 
     public static void enviarCliente(String nombreTicket, String nombreReal) {
-        try {
+        try { // sin el uid no puedes hacer nada con la api de odoo
             XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             config.setServerURL(new URL(URL_ODOO + "/xmlrpc/2/common"));
 
@@ -30,9 +30,10 @@ public class SincronizadorOdoo {
                 return;
             }
             int uid = (Integer) uidObj;
+             // ahora cambiamos al endpoint /object que es donde estan las operaciones reales
 
             config.setServerURL(new URL(URL_ODOO + "/xmlrpc/2/object"));
-
+// para crear el contacto en odoo res.partner es el mod
             Map<String, Object> datosCliente = new HashMap<>();
             datosCliente.put("name", nombreReal + " (" + nombreTicket + ")");
 
@@ -43,8 +44,10 @@ public class SincronizadorOdoo {
             ));
 
             int idPartner = (Integer) idPartnerObj;
+            //System.out.println("contacto creado con id: " + idPartner);
 
             Map<String, Object> datosCita = new HashMap<>();
+             // con el id crea entrada en crm
             datosCita.put("name", "Turno " + nombreTicket);
             datosCita.put("partner_id", idPartner);
             datosCita.put("description", "el paciente ha completado su turno");
